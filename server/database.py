@@ -32,20 +32,23 @@ class DB:
             raise UniqueUserConstrain
     
     def get_resources(self,username,date=None):
-        usertable = sqlite3.connect("usertable.db")
-        c = usertable.cursor()
-        self.cur.execute('SELECT table_number FROM usertableinfo where username=(?)',(username,))
-        table_name = self.cur.fetchone()[0]
-        if date == None:
-            c.execute('SELECT date FROM {}'.format(table_name))
-            date = c.fetchall()
-            print("=================================\n",date)
-            dates =  [x[0] for x in date ]
-            
-            return dates
-        elif date:
-            c.execute('SELECT expenditure FROM (?) where date=(?)',(table_name,date))
-            return c.fetchone()[0]
+        try:
+            usertable = sqlite3.connect("usertable.db")
+            c = usertable.cursor()
+            self.cur.execute('SELECT table_number FROM usertableinfo where username=(?)',(username,))
+            table_name = self.cur.fetchone()[0]
+            if date == None:
+                c.execute('SELECT date FROM {}'.format(table_name))
+                date = c.fetchall()
+                print("=================================\n",date)
+                dates =  [x[0] for x in date ]
+                
+                return dates
+            elif date:
+                c.execute('SELECT expenditure FROM (?) where date=(?)',(table_name,date))
+                return c.fetchone()[0]
+        except sqlite3.OperationalError:
+            return []
     
     def create_recource(self,username,date,expenditure):
         usertable = sqlite3.connect("usertable.db")
